@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Read image 
-img = cv2.imread('Img/test8.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test7.png',cv2.IMREAD_COLOR)
 
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)
@@ -67,6 +67,14 @@ gResult = cv2.cvtColor(result0,cv2.COLOR_BGR2GRAY)
 
 _,bResult = cv2.threshold(gResult,250,255,cv2.THRESH_BINARY_INV)
 
+contours, hierarchy = cv2.findContours(bResult.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+result = []
+for cntr in contours:
+    (x, y, w, h) = cv2.boundingRect(cntr)
+    result = result0[np.floor(y).astype('int'):np.ceil((y + h)).astype('int'), np.floor(x).astype('int'):np.ceil((x + w)).astype('int')]
+    
+
 # def semiBin(x):
 #     if x < 10:
 #         return 0
@@ -97,7 +105,7 @@ _,bResult = cv2.threshold(gResult,250,255,cv2.THRESH_BINARY_INV)
 
 
 cv2.imshow("Image", img)
-cv2.imshow("Resultado", bResult)
+cv2.imshow("Resultado", result)
 # cv2.imshow("Image", cv2.cvtColor(roi, cv2.COLOR_HSV2BGR))
 # cv2.imshow("Mask Red", maskR)
 cv2.waitKey(0)
