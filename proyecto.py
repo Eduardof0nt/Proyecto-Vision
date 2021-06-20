@@ -3,7 +3,7 @@ import numpy as np
 import yaml
 
 # Read image 
-img = cv2.imread('Img/test9.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test12.png',cv2.IMREAD_COLOR)
 
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)
@@ -27,7 +27,7 @@ for (c,approx0) in valid_cntrs:
     
     A = w*h
     
-    lowG = (30,100,100)
+    lowG = (30,80,80)
     highG = (80,255,255)
     maskG = cv2.inRange(roi, lowG, highG)
 
@@ -36,7 +36,8 @@ for (c,approx0) in valid_cntrs:
     for cntr in contoursG:
         peri = cv2.arcLength(cntr, True)
         approx = cv2.approxPolyDP(cntr, 0.04 * peri, True)
-        if cv2.countNonZero(maskG)/A > 0.2 and len(approx) > 5:
+        print(len(approx))
+        if cv2.countNonZero(maskG)/A > 0.15 and len(approx) > 5:
             valid_template_objects.append((x,y,w,h,approx0))
 
 template_object = []
