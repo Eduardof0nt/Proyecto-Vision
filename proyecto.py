@@ -3,7 +3,7 @@ import numpy as np
 import yaml
 
 # Read image 
-img = cv2.imread('Img/test6.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test9.png',cv2.IMREAD_COLOR)
 
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)
