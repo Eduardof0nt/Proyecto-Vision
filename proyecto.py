@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
+import yaml
 
 # Read image 
-img = cv2.imread('Img/test7.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test6.png',cv2.IMREAD_COLOR)
 
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)
@@ -73,7 +74,22 @@ result = []
 for cntr in contours:
     (x, y, w, h) = cv2.boundingRect(cntr)
     result = result0[np.floor(y).astype('int'):np.ceil((y + h)).astype('int'), np.floor(x).astype('int'):np.ceil((x + w)).astype('int')]
+
+# Camera angles
+cameraMatrix = []
+distCoeff = []
+with open("calibration_matrix.yaml", 'r') as stream:
+    cameraCalibration = yaml.load(stream)
+    cameraMatrix = np.array(cameraCalibration['camera_matrix'])
+    distCoeff = np.array(cameraCalibration['dist_coeff'])
+pts2Alt = np.zeros((4,3))
+pts2Alt[:,0:2] = pts2
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+ret,rvecs, tvecs = cv2.solvePnP(pts2Alt, pts1, cameraMatrix, distCoeff)
+
+print(np.rad2deg(rvecs))
     
+  
 
 # def semiBin(x):
 #     if x < 10:
