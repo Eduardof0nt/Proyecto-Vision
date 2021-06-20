@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from object_detector import *
 
 # Read image 
 img = cv2.imread('Img/test7.png',cv2.IMREAD_COLOR)
@@ -75,37 +76,45 @@ for cntr in contours:
     result = result0[np.floor(y).astype('int'):np.ceil((y + h)).astype('int'), np.floor(x).astype('int'):np.ceil((x + w)).astype('int')]
     
 
-# def semiBin(x):
-#     if x < 10:
-#         return 0
-#     else:
-#         return x
+# Load Object Detector
+detector = HomogeneousBgDetector()
 
-# vectFunction = np.vectorize(semiBin)
+# Draw polygon around the marker
+int_corners = np.int32([pts2])
+#int_corners = pts2.astype(np.int32)
+cv2.polylines(result, int_corners, True, (0, 255, 0), 5)
 
-# result2 = vectFunction(result)
+# Aruco Perimeter
+aruco_perimeter = cv2.arcLength(pts2, True)
 
-# threshImg = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+# Pixel to cm ratio
+pixel_cm_ratio = aruco_perimeter / 28
 
-# contoursF, _ = cv2.findContours(threshImg.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+contours = detector.detect_objects(result)
 
-# for cntr in contoursF:
-#     (x, y, w, h) = cv2.boundingRect(cntr)
-#     result = cv2.rectangle(result,(x,y),(x+w,y+h),(0,255,0),2)
-#     cv2.putText(result, str('X'), (x + w//4, y + h//2),cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
-    
-# cv2.drawContours(image=result, contours=contoursF, contourIdx=-1, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
+# Draw objects boundaries
+for cnt in contours:
+    # Get rect
+    rect = cv2.minAreaRect(cnt)
+    (x, y), (w, h), angle = rect
 
-# for v_o in valid_template_objects:
-#     (x,y,w,h) = v_o
-#     img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+    # Get Width and Height of the Objects by applying the Ratio pixel to cm
+    object_width = w / pixel_cm_ratio
+    object_height = h / pixel_cm_ratio
 
+    # Display rectangle
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
 
-# cv2.drawContours(image=imgC, contours=valid_cntrs, contourIdx=-1, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
+    cv2.circle(result, (int(x), int(y)), 5, (0, 0, 255), -1)
+    cv2.polylines(result, [box], True, (255, 0, 0), 2)
+    cv2.putText(result, "Width {} cm".format(round(object_width, 1)), (int(x - 100), int(y - 20)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
+    cv2.putText(result, "Height {} cm".format(round(object_height, 1)), (int(x - 100), int(y + 15)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
 
 
 cv2.imshow("Image", img)
 cv2.imshow("Resultado", result)
+print(pts2)
 # cv2.imshow("Image", cv2.cvtColor(roi, cv2.COLOR_HSV2BGR))
 # cv2.imshow("Mask Red", maskR)
 cv2.waitKey(0)
