@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
 import yaml
+from object_detector import *
 
 # Read image 
-img = cv2.imread('Img/test12.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test20.png',cv2.IMREAD_COLOR)
 
 cv2.imshow("Imagen Original", img)
 h = np.histogram(img, bins=256, range=(0,255))[0]                                 # Cálculo de histograma
@@ -54,17 +55,18 @@ for (c,approx0) in valid_cntrs:
     
     A = w*h
     
-    lowG = (30,80,80)
+    lowG = (30,50,50)
     highG = (80,255,255)
     maskG = cv2.inRange(roi, lowG, highG)
-
+    cv2.imshow("Image", maskG)
+    cv2.waitKey(0)
     contoursG, hierarchy = cv2.findContours(maskG.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     
     for cntr in contoursG:
         peri = cv2.arcLength(cntr, True)
         approx = cv2.approxPolyDP(cntr, 0.04 * peri, True)
         print(len(approx))
-        if cv2.countNonZero(maskG)/A > 0.15 and len(approx) > 5:
+        if cv2.countNonZero(maskG)/A > 0.1 and len(approx) >= 5:
             valid_template_objects.append((x,y,w,h,approx0))
 
 template_object = []
@@ -78,11 +80,11 @@ if template_object[1][0] > template_object[2][0]:
     template_object[2] = template_object[1]
     template_object[1] = tmp
 
-for i, center in enumerate(template_object):
+""" for i, center in enumerate(template_object):
     color = (255,0,0)
     if i == 3:
         color = (0,255,0)
-    img = cv2.circle(img,center,10,color,thickness=-1)
+    img = cv2.circle(img,center,10,color,thickness=-1) """
 
 s2 = img.shape*5
 pts1 = np.float32(template_object)
