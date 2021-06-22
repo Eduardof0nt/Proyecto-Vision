@@ -3,7 +3,7 @@ import numpy as np
 from object_detector import *
 
 # Read image 
-img = cv2.imread('Img/test7.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test11.jpg',cv2.IMREAD_COLOR)
 
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)
@@ -110,6 +110,8 @@ for cnt in contours:
     cv2.polylines(result, [box], True, (255, 0, 0), 2)
     cv2.putText(result, "Width {} cm".format(round(object_width, 1)), (int(x - 100), int(y - 20)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
     cv2.putText(result, "Height {} cm".format(round(object_height, 1)), (int(x - 100), int(y + 15)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
+
+
 
 
 cv2.imshow("Image", img)
