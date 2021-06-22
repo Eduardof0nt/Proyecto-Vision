@@ -4,7 +4,7 @@ import yaml
 from object_detector import *
 
 # Read image 
-img = cv2.imread('Img/test20.png',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test20.jpg',cv2.IMREAD_COLOR)
 
 cv2.imshow("Imagen Original", img)
 h = np.histogram(img, bins=256, range=(0,255))[0]                                 # Cálculo de histograma
@@ -58,14 +58,13 @@ for (c,approx0) in valid_cntrs:
     lowG = (30,50,50)
     highG = (80,255,255)
     maskG = cv2.inRange(roi, lowG, highG)
-    cv2.imshow("Image", maskG)
-    cv2.waitKey(0)
+    # cv2.imshow("Image", maskG)
+    # cv2.waitKey(0)
     contoursG, hierarchy = cv2.findContours(maskG.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     
     for cntr in contoursG:
         peri = cv2.arcLength(cntr, True)
         approx = cv2.approxPolyDP(cntr, 0.04 * peri, True)
-        print(len(approx))
         if cv2.countNonZero(maskG)/A > 0.1 and len(approx) >= 5:
             valid_template_objects.append((x,y,w,h,approx0))
 
@@ -109,7 +108,7 @@ for cntr in contours:
 cameraMatrix = []
 distCoeff = []
 with open("calibration_matrix.yaml", 'r') as stream:
-    cameraCalibration = yaml.load(stream)
+    cameraCalibration = yaml.safe_load(stream)
     cameraMatrix = np.array(cameraCalibration['camera_matrix'])
     distCoeff = np.array(cameraCalibration['dist_coeff'])
 pts2Alt = np.zeros((4,3))
@@ -122,6 +121,42 @@ print('La posición de la cámara (ángulos) es la siguiente:')
 print('Rotación en el eje "x": {0}°'.format(angles[0]))
 print('Rotación en el eje "y": {0}°'.format(angles[1]))
 print('Rotación en el eje "z": {0}°'.format(angles[2]))
+
+# Load Object Detector
+detector = HomogeneousBgDetector()
+
+# Draw polygon around the marker
+int_corners = np.int32([pts2])
+#int_corners = pts2.astype(np.int32)
+cv2.polylines(result, int_corners, True, (0, 255, 0), 5)
+
+# Aruco Perimeter
+aruco_perimeter = cv2.arcLength(pts2, True)
+
+# Pixel to cm ratio
+pixel_cm_ratio = aruco_perimeter / 32
+
+contours = detector.detect_objects(result)
+
+# Draw objects boundaries
+for cnt in contours:
+    # Get rect
+    rect = cv2.minAreaRect(cnt)
+    (x, y), (w, h), angle = rect
+
+    # Get Width and Height of the Objects by applying the Ratio pixel to cm
+    object_width = w / pixel_cm_ratio
+    object_height = h / pixel_cm_ratio
+
+    # Display rectangle
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
+
+    cv2.circle(result, (int(x), int(y)), 5, (0, 0, 255), -1)
+    cv2.polylines(result, [box], True, (255, 0, 0), 2)
+    cv2.putText(result, "Width {} cm".format(round(object_width, 1)), (int(x - 100), int(y - 20)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
+    cv2.putText(result, "Height {} cm".format(round(object_height, 1)), (int(x - 100), int(y + 15)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
+
 
 
 # cv2.imshow("Image", img)
