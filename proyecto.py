@@ -7,13 +7,13 @@ from object_detector import *
 img = cv2.imread('Img/test20.jpg',cv2.IMREAD_COLOR)
 
 cv2.imshow("Imagen Original", img)
-h = np.histogram(img, bins=256, range=(0,255))[0]                                 # Cálculo de histograma
+h = np.histogram(img, bins=256, range=(0,255))[0] # Historgram
 
-r_min = 0                                                               #Se calculan el minimo y máximo del histograma
+r_min = 0 #The maximum and minimum values of the histogram are calculated
 r_max = 0
 min_counter = 0
 max_counter = 0
-r = np.ceil(img.shape[0]*img.shape[1]*0.01) #1% de los píxeles más brillantes u obscuros
+r = np.ceil(img.shape[0]*img.shape[1]*0.01) #1% of the brightest or dimest pixels
 for i in range(0, h.shape[0]):
     if min_counter <= r or max_counter <= r:
         if h[i] != 0 and min_counter <= r:
@@ -26,7 +26,7 @@ for i in range(0, h.shape[0]):
         break
 
 if r_max - r_min < 250:
-    print('Se cambió el contraste de la imagen') #Alertar usuario
+    print('Se cambió el contraste de la imagen') #Alert user
     print("Histograma de la imagen original desde {} hasta {}".format(r_min, r_max))
     m = 255.0/(r_max-r_min)
     img = (img*m)-r_min;
@@ -79,12 +79,6 @@ if template_object[1][0] > template_object[2][0]:
     template_object[2] = template_object[1]
     template_object[1] = tmp
 
-""" for i, center in enumerate(template_object):
-    color = (255,0,0)
-    if i == 3:
-        color = (0,255,0)
-    img = cv2.circle(img,center,10,color,thickness=-1) """
-
 s2 = img.shape*5
 pts1 = np.float32(template_object)
 pts2 = np.float32([[s2[0]-100,s2[1]-100],[s2[0]-100,s2[1]],[s2[0],s2[1]-100],[s2[0],s2[1]]])
@@ -130,11 +124,11 @@ int_corners = np.int32([pts2])
 #int_corners = pts2.astype(np.int32)
 cv2.polylines(result, int_corners, True, (0, 255, 0), 5)
 
-# Aruco Perimeter
-aruco_perimeter = cv2.arcLength(pts2, True)
+# Template Object Perimeter
+template_perimeter = cv2.arcLength(pts2, True)
 
 # Pixel to cm ratio
-pixel_cm_ratio = aruco_perimeter / 32
+pixel_cm_ratio = template_perimeter / 32
 
 contours = detector.detect_objects(result)
 
@@ -158,9 +152,5 @@ for cnt in contours:
     cv2.putText(result, "Height {} cm".format(round(object_height, 1)), (int(x - 100), int(y + 15)), cv2.FONT_HERSHEY_PLAIN, 2, (100, 200, 0), 2)
 
 
-
-# cv2.imshow("Image", img)
 cv2.imshow("Resultado", result)
-# cv2.imshow("Image", cv2.cvtColor(roi, cv2.COLOR_HSV2BGR))
-# cv2.imshow("Mask Red", maskR)
 cv2.waitKey(0)
