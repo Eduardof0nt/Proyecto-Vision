@@ -5,6 +5,33 @@ import yaml
 # Read image 
 img = cv2.imread('Img/test12.png',cv2.IMREAD_COLOR)
 
+cv2.imshow("Imagen Original", img)
+h = np.histogram(img, bins=256, range=(0,255))[0]                                 # Cálculo de histograma
+
+r_min = 0                                                               #Se calculan el minimo y máximo del histograma
+r_max = 0
+min_counter = 0
+max_counter = 0
+r = np.ceil(img.shape[0]*img.shape[1]*0.01) #1% de los píxeles más brillantes u obscuros
+for i in range(0, h.shape[0]):
+    if min_counter <= r or max_counter <= r:
+        if h[i] != 0 and min_counter <= r:
+            r_min = i
+            min_counter += h[i]
+        if h[h.shape[0]-i-1] != 0 and max_counter <= r:
+            r_max = h.shape[0]-i-1
+            max_counter += h[h.shape[0]-i-1]
+    else:
+        break
+
+if r_max - r_min < 250:
+    print('Se cambió el contraste de la imagen') #Alertar usuario
+    print("Histograma de la imagen original desde {} hasta {}".format(r_min, r_max))
+    m = 255.0/(r_max-r_min)
+    img = (img*m)-r_min;
+    img = np.clip(img, 0,255).astype(np.uint8)
+    cv2.imshow("Imagen Ecualizada", img)
+
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)
 highR = (10,255,255)
@@ -88,40 +115,14 @@ pts2Alt[:,0:2] = pts2
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 ret,rvecs, tvecs = cv2.solvePnP(pts2Alt, pts1, cameraMatrix, distCoeff)
 
-print(np.rad2deg(rvecs))
-    
-  
-
-# def semiBin(x):
-#     if x < 10:
-#         return 0
-#     else:
-#         return x
-
-# vectFunction = np.vectorize(semiBin)
-
-# result2 = vectFunction(result)
-
-# threshImg = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
-
-# contoursF, _ = cv2.findContours(threshImg.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-
-# for cntr in contoursF:
-#     (x, y, w, h) = cv2.boundingRect(cntr)
-#     result = cv2.rectangle(result,(x,y),(x+w,y+h),(0,255,0),2)
-#     cv2.putText(result, str('X'), (x + w//4, y + h//2),cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
-    
-# cv2.drawContours(image=result, contours=contoursF, contourIdx=-1, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
-
-# for v_o in valid_template_objects:
-#     (x,y,w,h) = v_o
-#     img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+angles = np.abs(np.rad2deg(rvecs[:,0]))
+print('La posición de la cámara (ángulos) es la siguiente:')
+print('Rotación en el eje "x": {0}°'.format(angles[0]))
+print('Rotación en el eje "y": {0}°'.format(angles[1]))
+print('Rotación en el eje "z": {0}°'.format(angles[2]))
 
 
-# cv2.drawContours(image=imgC, contours=valid_cntrs, contourIdx=-1, color=(255, 255, 255), thickness=1, lineType=cv2.LINE_AA)
-
-
-cv2.imshow("Image", img)
+# cv2.imshow("Image", img)
 cv2.imshow("Resultado", result)
 # cv2.imshow("Image", cv2.cvtColor(roi, cv2.COLOR_HSV2BGR))
 # cv2.imshow("Mask Red", maskR)
