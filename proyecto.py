@@ -3,7 +3,7 @@ import numpy as np
 from object_detector import *
 
 # Read image 
-img = cv2.imread('Img/test11.jpg',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test12.jpg',cv2.IMREAD_COLOR)
 
 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 lowR = (0,100,100)

@@ -21,7 +21,7 @@ class HomogeneousBgDetector():
         for cnt in contours:
             area = cv2.contourArea(cnt)
             #23000
-            if area > 3000 and area < 20000 :
+            if area > 3000 and area < 18000 :
                 #cnt = cv2.approxPolyDP(cnt, 0.03*cv2.arcLength(cnt, True), True)
                 objects_contours.append(cnt)
 
