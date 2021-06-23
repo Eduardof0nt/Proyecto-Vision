@@ -4,7 +4,7 @@ import yaml
 from object_detector import *
 
 # Read image 
-img = cv2.imread('Img/test20.jpg',cv2.IMREAD_COLOR)
+img = cv2.imread('Img/test21.jpg',cv2.IMREAD_COLOR)
 
 cv2.imshow("Imagen Original", img)
 h = np.histogram(img, bins=256, range=(0,255))[0] # Historgram
@@ -27,7 +27,7 @@ for i in range(0, h.shape[0]):
 
 if r_max - r_min < 250:
     print('Se cambió el contraste de la imagen') #Alert user
-    print("Histograma de la imagen original desde {} hasta {}".format(r_min, r_max))
+    print("El histograma de la imagen original va desde {} hasta {}".format(r_min, r_max))
     m = 255.0/(r_max-r_min)
     img = (img*m)-r_min;
     img = np.clip(img, 0,255).astype(np.uint8)

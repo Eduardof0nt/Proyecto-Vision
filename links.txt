@@ -1,0 +1,3 @@
+Presentación: https://youtu.be/vLXYdW7Ju34
+Demostración del funcionamiento en tiempo real: https://youtu.be/9rA8LL0RA-g
+Proyecto en GitHub: https://github.com/Eduardof0nt/Proyecto-Vision
